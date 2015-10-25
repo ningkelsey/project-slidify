@@ -1,0 +1,70 @@
+---
+title       : Motor Trend Car Road Tests  
+subtitle    : Shiny Application
+author      : Kelsey Ning
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : [bootstrap, quiz, shiny, interactive]            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+ext_widgets: {rCharts: [libraries/nvd3]}
+---
+
+
+## Introduction
+
+This application is designed to check out the results of motor trend car road tests. The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models). 
+
+From the left panel, one can choose the two variables X and Y, then the plot of the corelation between the two variables appears on the right side. A smoothed condition mean can be added into the plot by check the box of Smooth. Comparisons of different variables can be added through Facet Row and Facet Column panel. 
+
+Here, we also want to show how the vehicle weight effect on the fuel consumption. Based on the linear regression model of weight on mpg, we can predict the mpg (fit value with upper/lower end points) by entering the weight.
+
+Codes (ui.R & server.R) can be found [here](https://github.com/ningkelsey/project)
+
+---
+## Plot Section - Input
+
+```{r opts.label = 'shiny'}
+slidifyUI(
+  sidebarPanel(
+        selectInput('x', 'X Variables', names(mtcars)), 
+        selectInput('y', 'Y Variables', names(mtcars)),
+        checkboxInput('smooth', 'Smooth'),
+        selectInput('facet_row', 'Facet Row', c(None='.', names(mtcars))),
+        selectInput('facet_col', 'Facet Column', c(None='.', names(mtcars)))
+  ),
+  mainPanel(
+    tags$div(id='nvd3plot',class='shiny-html-output nvd3 rChart')
+)
+  )
+```
+
+---
+
+## Plot Section - Plot
+
+```{r echo = F, results = 'asis'}
+library(ggplot2)
+  p <- ggplot(mtcars, aes(x=mpg, y=wt)) + geom_point() 
+  p
+```
+
+
+---
+## Impact of Vehicle Weight on Fuel consumption
+
+```{r opts.label = 'shiny'}
+slidifyUI(
+  sidebarPanel(
+             numericInput('wtinput','Weight, lb',1000)
+             ),
+           mainPanel(
+             h3('Results of Fuel consumption on a given weight'),
+             h4('mpg value, Miles/galon'),
+             verbatimTextOutput('mpgpred')
+             )
+  )
+
+```
